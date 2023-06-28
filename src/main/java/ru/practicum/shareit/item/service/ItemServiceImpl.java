@@ -38,7 +38,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto update(Integer itemId, ItemDto itemDto, Integer userId) {
         Item item = itemStorage.getItemId(itemId);
-        if (item.getOwner().getId() != userId) {
+        if (!item.getOwner().getId().equals(userId)) {
             throw new ObjectNotFoundException("Пользователь не найден!");
         }
         Item itemUpdate = ItemMapper.toItem(itemDto);

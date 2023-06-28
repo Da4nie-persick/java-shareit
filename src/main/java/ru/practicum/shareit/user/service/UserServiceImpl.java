@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto update(UserDto userDto, Integer id) {
         for (User user : userStorage.allUser()) {
-            if (user.getEmail().equals(userDto.getEmail()) && user.getId() != id) {
+            if (user.getEmail().equals(userDto.getEmail()) && !(user.getId().equals(id))) {
                 throw new ConflictException("Обновить Email другого пользователя нельзя!");
             }
         }

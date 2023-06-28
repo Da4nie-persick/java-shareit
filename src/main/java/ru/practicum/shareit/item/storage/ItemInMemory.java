@@ -56,7 +56,7 @@ public class ItemInMemory implements ItemStorage {
     @Override
     public List<Item> getItemByOwner(Integer userId) {
         return itemMap.values().stream()
-                .filter(item -> item.getOwner().getId() == userId)
+                .filter(item -> item.getOwner().getId().equals(userId))
                 .collect(Collectors.toList());
     }
 }
