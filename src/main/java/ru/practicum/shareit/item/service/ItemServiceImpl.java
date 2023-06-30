@@ -3,12 +3,10 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
-import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.storage.UserStorage;
 
 import java.util.List;
@@ -22,16 +20,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto create(ItemDto itemDto, Integer userId) {
-        User user = userStorage.getUserId(userId);
-        if (!userStorage.allUser().contains(user)) {
-            throw new ObjectNotFoundException("Пользователь не найден!");
-        }
-        if (itemDto.getAvailable() == null || itemDto.getName().isEmpty() || itemDto.getDescription() == null) {
-            throw new ValidationException("Статус, название или описание не должно быть пустым!");
-        }
-        Item item = ItemMapper.toItem(itemDto);
-        item.setOwner(user);
-
+        Item item = ItemMapper.toItem(itemDto, userStorage.getUserId(userId));
         return ItemMapper.toItemDto(itemStorage.create(item));
     }
 
@@ -41,7 +30,7 @@ public class ItemServiceImpl implements ItemService {
         if (!item.getOwner().getId().equals(userId)) {
             throw new ObjectNotFoundException("Пользователь не найден!");
         }
-        Item itemUpdate = ItemMapper.toItem(itemDto);
+        Item itemUpdate = ItemMapper.toItem(itemDto, userStorage.getUserId(userId));
         return ItemMapper.toItemDto(itemStorage.update(itemId, itemUpdate));
     }
 

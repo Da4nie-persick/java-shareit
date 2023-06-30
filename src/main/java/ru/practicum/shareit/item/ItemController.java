@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -15,7 +16,7 @@ public class ItemController {
 
     @PostMapping
     public ItemDto create(@RequestHeader("X-Sharer-User-Id") Integer userId,
-                          @RequestBody ItemDto itemDto) {
+                          @Valid @RequestBody ItemDto itemDto) {
         return itemService.create(itemDto, userId);
     }
 

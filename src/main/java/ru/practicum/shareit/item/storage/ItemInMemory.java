@@ -1,7 +1,9 @@
 package ru.practicum.shareit.item.storage;
 
 import org.springframework.stereotype.Repository;
+import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.item.Item;
+import ru.practicum.shareit.user.User;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -10,10 +12,15 @@ import java.util.stream.Collectors;
 public class ItemInMemory implements ItemStorage {
     private final Map<Integer, Item> itemMap = new HashMap<>();
     private int id = 0;
+    private final Map<Integer, List<Item>> itemByOwnerMap = new LinkedHashMap<>();
 
     @Override
     public Item create(Item item) {
+        if (item.getOwner() == null) {
+            throw new ObjectNotFoundException("Пользователь не найден!");
+        }
         item.setId(++id);
+        addOwnerList(item, item.getOwner());
         itemMap.put(item.getId(), item);
         return item;
     }
@@ -55,8 +62,12 @@ public class ItemInMemory implements ItemStorage {
 
     @Override
     public List<Item> getItemByOwner(Integer userId) {
-        return itemMap.values().stream()
-                .filter(item -> item.getOwner().getId().equals(userId))
-                .collect(Collectors.toList());
+        return itemByOwnerMap.get(userId);
+    }
+
+    private void addOwnerList(Item item, User user) {
+        List<Item> itemList = new ArrayList<>();
+        itemList.add(item);
+        itemByOwnerMap.put(user.getId(), itemList);
     }
 }

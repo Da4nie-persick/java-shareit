@@ -1,6 +1,7 @@
 package ru.practicum.shareit.exception;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -10,17 +11,17 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleValidationException(final ConflictException e) {
+    public ErrorResponse handleConflictException(final ConflictException e) {
         return new ErrorResponse(
                 e.getMessage()
         );
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationException(final ValidationException e) {
+    public ErrorResponse handleValidationException(MethodArgumentNotValidException e) {
         return new ErrorResponse(
-                e.getMessage()
+                e.getBindingResult().getAllErrors().get(0).getDefaultMessage()
         );
     }
 

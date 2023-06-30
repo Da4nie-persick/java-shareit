@@ -1,19 +1,19 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 public class ItemDto {
     private Integer id;
-    @NotBlank
+    @NotBlank(message = "Имя вещи не может быть пустым!")
     private String name;
-    @NotBlank
+    @NotBlank(message = "Описание вещи не может быть пустым!")
     private String description;
-    @NotNull
+    @NotNull(message = "Статус вещи не может быть пустым!")
     private Boolean available;
 }
