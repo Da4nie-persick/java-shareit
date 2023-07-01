@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 @Repository
 public class ItemInMemory implements ItemStorage {
     private final Map<Integer, Item> itemMap = new HashMap<>();
-    private int id = 0;
     private final Map<Integer, List<Item>> itemByOwnerMap = new LinkedHashMap<>();
+    private int id = 0;
 
     @Override
     public Item create(Item item) {
@@ -66,8 +66,6 @@ public class ItemInMemory implements ItemStorage {
     }
 
     private void addOwnerList(Item item, User user) {
-        List<Item> itemList = new ArrayList<>();
-        itemList.add(item);
-        itemByOwnerMap.put(user.getId(), itemList);
+        itemByOwnerMap.computeIfAbsent(user.getId(), k -> new ArrayList<>()).add(item);
     }
 }
