@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class ItemMapper {
     public static final ItemDto toItemDto(Item item) {
         ItemDto.ItemRequest itemRequest = new ItemDto.ItemRequest();
-        if(item.getRequest() != null) {
+        if (item.getRequest() != null) {
             itemRequest.setId(itemRequest.getId());
         }
         ItemDto itemDto = new ItemDto();
