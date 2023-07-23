@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,7 +22,6 @@ public class ItemDto {
     @Getter
     @Setter
     @NoArgsConstructor
-    @AllArgsConstructor
     public static class ItemRequest {
         public Integer id;
     }
