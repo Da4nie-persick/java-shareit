@@ -14,11 +14,16 @@ import java.util.stream.Collectors;
 
 public class ItemMapper {
     public static final ItemDto toItemDto(Item item) {
+        ItemDto.ItemRequest itemRequest = new ItemDto.ItemRequest();
+        if(item.getRequest() != null) {
+            itemRequest.setId(itemRequest.getId());
+        }
         ItemDto itemDto = new ItemDto();
         itemDto.setId(item.getId());
         itemDto.setName(item.getName());
         itemDto.setDescription(item.getDescription());
         itemDto.setAvailable(item.getAvailable());
+        itemDto.setRequest(itemRequest);
         return itemDto;
     }
 
