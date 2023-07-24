@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class BookingDtoRequest {
-    private Integer id;
     @NotNull
     @FutureOrPresent(message = "Броннирование не должно быть в прошлом")
     private LocalDateTime start;
@@ -19,5 +18,4 @@ public class BookingDtoRequest {
     @Future(message = "Броннирование не должно быть в прошлом")
     private LocalDateTime end;
     private Integer itemId;
-    private Integer bookingId;
 }

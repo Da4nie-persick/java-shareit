@@ -21,7 +21,6 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException(MethodArgumentNotValidException e) {
         return new ErrorResponse(
-                //e.getMessage()
                 e.getBindingResult().getAllErrors().get(0).getDefaultMessage()
         );
     }

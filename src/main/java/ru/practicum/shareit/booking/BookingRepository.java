@@ -12,11 +12,17 @@ import java.util.List;
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
     List<Booking> findAllByBookerIdOrderByStartDesc(Integer userId);
 
-    List<Booking> findAllByBookerIdAndEndBeforeOrderByStartDesc(Integer userId, LocalDateTime end);
+    @Query(value = "select * from bookings b join items i on b.item_id = i.id where booker_id = ?1 " +
+            "and end_date < ?2 order by start_date desc", nativeQuery = true)
+    List<Booking> findAllByBookerIdPast(Integer userId, LocalDateTime end);
 
-    List<Booking> findAllByBookerIdAndStartAfterOrderByStartDesc(Integer userId, LocalDateTime start);
+    @Query(value = "select * from bookings b join items i on b.item_id = i.id where booker_id = ?1 " +
+            "and start_date > ?2 order by start_date desc", nativeQuery = true)
+    List<Booking> findAllByBookerIdFuture(Integer userId, LocalDateTime start);
 
-    List<Booking> findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(Integer userId, LocalDateTime start, LocalDateTime end);
+    @Query(value = "select * from bookings b join items i on b.item_id = i.id where booker_id = ?1 " +
+            "and ?2 between start_date and end_date order by start_date desc", nativeQuery = true)
+    List<Booking> findAllByBookerIdCurrent(Integer userId, LocalDateTime start, LocalDateTime end);
 
     List<Booking> findAllByBookerIdAndStatusOrderByStartDesc(Integer userId, Status status);
 

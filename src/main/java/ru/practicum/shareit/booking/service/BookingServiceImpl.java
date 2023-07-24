@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.model.State;
@@ -30,6 +31,7 @@ public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
 
     @Override
+    @Transactional
     public BookingDtoResponse create(BookingDtoRequest bookingDto, Integer userId) {
         Item item = itemRepository.findById(bookingDto.getItemId())
                 .orElseThrow(() -> new ObjectNotFoundException("Вещь не найдена!"));
@@ -46,14 +48,12 @@ public class BookingServiceImpl implements BookingService {
                 || (bookingDto.getEnd()).equals(bookingDto.getStart())) {
             throw new BookingException("Проверьте время!");
         }
-        Booking booking = BookingMapper.toBooking(bookingDto);
-        booking.setBooker(user);
-        booking.setItem(item);
-        booking.setStatus(Status.WAITING);
+        Booking booking = BookingMapper.toBooking(bookingDto, item, user);
         return BookingMapper.toBookingDto(bookingRepository.save(booking));
     }
 
     @Override
+    @Transactional
     public BookingDtoResponse approvedOrRejected(Boolean approved, Integer bookingId, Integer userId) {
         if (approved == null) {
             throw new BookingException("Не корректный approved");
@@ -71,6 +71,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BookingDtoResponse getBookingId(Integer bookingId, Integer userId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ObjectNotFoundException("Бронь не найдена!"));
@@ -81,6 +82,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingDtoResponse> getAllByUserId(Integer userId, String state) {
         if (!userRepository.existsById(userId)) {
             throw new ObjectNotFoundException("Пользователь не найден!");
@@ -94,14 +96,13 @@ public class BookingServiceImpl implements BookingService {
                 bookingList = bookingRepository.findAllByBookerIdOrderByStartDesc(userId);
                 break;
             case CURRENT:
-                bookingList = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId,
-                        LocalDateTime.now(), LocalDateTime.now());
+                bookingList = bookingRepository.findAllByBookerIdCurrent(userId, LocalDateTime.now(), LocalDateTime.now());
                 break;
             case PAST:
-                bookingList = bookingRepository.findAllByBookerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now());
+                bookingList = bookingRepository.findAllByBookerIdPast(userId, LocalDateTime.now());
                 break;
             case FUTURE:
-                bookingList = bookingRepository.findAllByBookerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now());
+                bookingList = bookingRepository.findAllByBookerIdFuture(userId, LocalDateTime.now());
                 break;
             case WAITING:
                 bookingList = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING);
@@ -114,6 +115,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingDtoResponse> getAllByOwner(Integer userId, String state) {
         if (!userRepository.existsById(userId)) {
             throw new ObjectNotFoundException("Пользователь не найден!");

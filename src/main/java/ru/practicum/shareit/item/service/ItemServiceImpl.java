@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.model.Status;
@@ -34,6 +35,7 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
 
     @Override
+    @Transactional
     public ItemDto create(ItemDto itemDto, Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден!"));
@@ -42,6 +44,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public ItemDto update(Integer itemId, ItemDto itemDto, Integer userId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ObjectNotFoundException("Вещь с данным id не найдена!"));
@@ -62,6 +65,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ItemWithBookingDto getItemId(Integer userId, Integer id) {
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Вещь с данным id не найдена!"));
@@ -76,6 +80,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemDto> searchItem(String query) {
         if (query.isEmpty()) {
             return new ArrayList<>();
@@ -86,6 +91,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemWithBookingDto> getItemByOwner(Integer userId) {
         return itemRepository.getAllByOwnerId(userId).stream()
                 .map(item -> {
@@ -98,6 +104,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public CommentDto addComment(CommentDto commentDto, Integer userId, Integer itemId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден!"));
