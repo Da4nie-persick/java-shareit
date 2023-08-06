@@ -220,26 +220,32 @@ public class BookingServiceTest {
     }
 
     @Test
-    public void createBookingInvalidTime() {
+    public void createBookingItemNotFoundTest() {
         BookingDtoRequest bookingRequest = new BookingDtoRequest(
-                LocalDateTime.now().plusMinutes(1),
+                LocalDateTime.now().minusMinutes(90),
                 LocalDateTime.now().plusMinutes(1),
                 item.getId());
 
-        Booking booking = BookingMapper.toBooking(bookingRequest, item, otherUser);
+        Exception exception = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> bookingService.create(bookingRequest, otherUser.getId()));
 
-        when(userRepository.findById(booking.getBooker().getId()))
-                .thenReturn(Optional.ofNullable(booking.getBooker()));
+        Assertions.assertEquals("Вещь не найдена!", exception.getMessage());
+    }
+
+    @Test
+    public void createBookingUserNotFoundTest() {
+        BookingDtoRequest bookingRequest = new BookingDtoRequest(
+                LocalDateTime.now().minusMinutes(90),
+                LocalDateTime.now().plusMinutes(1),
+                item.getId());
 
         when(itemRepository.findById(bookingRequest.getItemId()))
                 .thenReturn(Optional.ofNullable(item));
 
-        when(bookingRepository.save(booking)).thenReturn(booking);
-
-        Exception exception = Assertions.assertThrows(BookingException.class,
+        Exception exception = Assertions.assertThrows(ObjectNotFoundException.class,
                 () -> bookingService.create(bookingRequest, otherUser.getId()));
 
-        Assertions.assertEquals("Проверьте время!", exception.getMessage());
+        Assertions.assertEquals("Пользователь не найден!", exception.getMessage());
     }
 
     @Test
