@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.service;
 
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 
@@ -12,7 +13,7 @@ public interface BookingService {
 
     BookingDtoResponse getBookingId(Integer bookingId, Integer userId);
 
-    List<BookingDtoResponse> getAllByUserId(Integer userId, String state);
+    List<BookingDtoResponse> getAllByUserId(Integer userId, String state, Integer size, Integer from);
 
-    List<BookingDtoResponse> getAllByOwner(Integer userId, String state);
+    List<BookingDtoResponse> getAllByOwner(Integer userId, String state, Integer size, Integer from);
 }

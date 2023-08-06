@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.shareit.booking.dto.BookingNotObjectsDto;
 
@@ -10,6 +12,8 @@ import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ItemWithBookingDto {
     private Integer id;
     @NotBlank(message = "Имя вещи не может быть пустым!")

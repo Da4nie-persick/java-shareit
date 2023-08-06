@@ -22,7 +22,7 @@ public class BookingController {
     }
 
     @PatchMapping(value = "/{bookingId}")
-    public BookingDtoResponse approvedOrRejected(@RequestHeader("X-Sharer-User-Id") Integer userId,
+    public BookingDtoResponse Booking(@RequestHeader("X-Sharer-User-Id") Integer userId,
                                                  @RequestParam Boolean approved,
                                                  @PathVariable Integer bookingId) {
         return bookingService.approvedOrRejected(approved, bookingId, userId);
@@ -36,13 +36,17 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDtoResponse> getAllByUserId(@RequestHeader("X-Sharer-User-Id") Integer userId,
-                                                   @RequestParam(defaultValue = "ALL") String state) {
-        return bookingService.getAllByUserId(userId, state);
+                                                   @RequestParam(defaultValue = "ALL") String state,
+                                                   @RequestParam(defaultValue = "10", required = false) Integer size,
+                                                   @RequestParam(defaultValue = "0", required = false) Integer from) {
+        return bookingService.getAllByUserId(userId, state, size, from);
     }
 
     @GetMapping(value = "/owner")
     public List<BookingDtoResponse> getAllByOwner(@RequestHeader("X-Sharer-User-Id") Integer userId,
-                                                  @RequestParam(defaultValue = "ALL") String state) {
-        return bookingService.getAllByOwner(userId, state);
+                                                  @RequestParam(defaultValue = "ALL") String state,
+                                                  @RequestParam(defaultValue = "10", required = false) Integer size,
+                                                  @RequestParam(defaultValue = "0", required = false) Integer from) {
+        return bookingService.getAllByOwner(userId, state, size, from);
     }
 }
