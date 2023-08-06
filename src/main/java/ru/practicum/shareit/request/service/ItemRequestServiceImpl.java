@@ -55,7 +55,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             throw new ObjectNotFoundException("Пользователь не найден!");
         }
         List<ItemRequest> itemRequestList = itemRequestRepository.findByRequesterIdIsNot(userId,
-                PageRequest.of(from , size, Sort.by("created")));
+                PageRequest.of(from, size, Sort.by("created")));
         return itemRequestList.stream()
                 .map(itemRequest -> {
                     List<Item> itemsList = itemRepository.findByRequestId(itemRequest.getId(), Sort.by("id").descending());
