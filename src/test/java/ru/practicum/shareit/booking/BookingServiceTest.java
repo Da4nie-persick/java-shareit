@@ -116,6 +116,21 @@ public class BookingServiceTest {
 
     @Test
     public void getAllByUserIdStateFuture() {
+        when(userRepository.existsById(user.getId()))
+                .thenReturn(true);
+
+        when(bookingRepository.findAllByBookerIdFuture(anyInt(), any(), any()))
+                .thenReturn(List.of(booking2));
+
+        List<BookingDtoResponse> list = bookingService.getAllByUserId(user.getId(), "FUTURE", 10, 0);
+
+        Assertions.assertEquals(1, list.size());
+        Assertions.assertEquals("item1", list.get(0).getItem().getName());
+        Assertions.assertEquals("user2", list.get(0).getBooker().getName());
+    }
+
+    @Test
+    public void getAllByUserIdStateFutureUserNotFount() {
         Exception exception = Assertions.assertThrows(ObjectNotFoundException.class,
                 () -> bookingService.getAllByUserId(otherUser.getId(), "FUTURE", 10, 0));
 
@@ -150,16 +165,6 @@ public class BookingServiceTest {
         Assertions.assertEquals(1, list.size());
         Assertions.assertEquals("item1", list.get(0).getItem().getName());
         Assertions.assertEquals("user2", list.get(0).getBooker().getName());
-    }
-
-    @Test
-    public void getAllByUserIdInvalidState() {
-        when(userRepository.existsById(user.getId()))
-                .thenReturn(true);
-        Exception exception = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> bookingService.getAllByUserId(user.getId(), "Staiii", 10, 0));
-
-        Assertions.assertEquals("Unknown state: Staiii", exception.getMessage());
     }
 
     @Test
@@ -222,8 +227,8 @@ public class BookingServiceTest {
     @Test
     public void createBookingInvalidTime() {
         BookingDtoRequest bookingRequest = new BookingDtoRequest(
-                LocalDateTime.now().minusMinutes(10),
-                LocalDateTime.now().plusMinutes(20),
+                LocalDateTime.now().minusMinutes(90),
+                LocalDateTime.now().plusMinutes(1),
                 item.getId());
 
         Booking booking = BookingMapper.toBooking(bookingRequest, item, otherUser);
@@ -408,5 +413,15 @@ public class BookingServiceTest {
         Assertions.assertEquals(1, list.size());
         Assertions.assertEquals("item1", list.get(0).getItem().getName());
         Assertions.assertEquals("user2", list.get(0).getBooker().getName());
+    }
+
+    @Test
+    public void getAllByOwnerInvalidState() {
+        when(userRepository.existsById(user.getId()))
+                .thenReturn(true);
+        Exception exception = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> bookingService.getAllByOwner(user.getId(), "Staiii", 10, 0));
+
+        Assertions.assertEquals("Unknown state: Staiii", exception.getMessage());
     }
 }
