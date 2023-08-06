@@ -81,6 +81,30 @@ public class RequestServiceTest {
     }
 
     @Test
+    public void getRequestIdNotFoundItem() {
+        when(userRepository.existsById(user.getId()))
+                .thenReturn(true);
+
+        Exception exception = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> requestService.getRequestId(1, 1));
+        assertThat(exception.getMessage(), equalTo("Вещь не найдена!"));
+    }
+
+    @Test
+    public void getRequestIdSuccessfulTest() {
+        when(userRepository.existsById(user.getId()))
+                .thenReturn(true);
+
+        when(requestRepository.findById(any()))
+                .thenReturn(Optional.ofNullable(itemRequest1));
+
+        ItemRequestDto itemRequestDto = requestService.getRequestId(1, 1);
+        assertThat(itemRequestDto.getId(), equalTo(itemRequest1.getId()));
+        assertThat(itemRequestDto.getDescription(), equalTo(itemRequest1.getDescription()));
+        assertThat(itemRequestDto.getCreated().toString(), equalTo(itemRequest1.getCreated().toString()));
+    }
+
+    @Test
     public void getRequestsAllOthersNotFoundUser() {
         Exception exception = Assertions.assertThrows(ObjectNotFoundException.class,
                 () -> requestService.getRequestsAllOthers(7, 10, 1));

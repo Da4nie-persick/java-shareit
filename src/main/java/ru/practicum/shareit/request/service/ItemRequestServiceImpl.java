@@ -70,7 +70,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             throw new ObjectNotFoundException("Пользователь не найден!");
         }
         ItemRequest itemRequest = itemRequestRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Запрос не найден!"));
+                .orElseThrow(() -> new ObjectNotFoundException("Вещь не найдена!"));
 
         List<Item> itemsList = itemRepository.findByRequestId(itemRequest.getId(), Sort.by("id").descending());
         return RequestMapper.toItemRequestDto(itemRequest, itemsList);

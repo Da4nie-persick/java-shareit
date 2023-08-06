@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
+import ru.practicum.shareit.exception.BookingException;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -63,6 +64,14 @@ public class ItemServiceTest {
         Exception exception = Assertions.assertThrows(ObjectNotFoundException.class,
                 () -> itemService.create(ItemMapper.toItemDto(item), 3));
         Assertions.assertEquals("Пользователь не найден!", exception.getMessage());
+    }
+
+    @Test
+    public void createItemSuccessfulTest() {
+        when(itemRepository.save(any())).thenReturn(item);
+        when(userRepository.findById(any())).thenReturn(Optional.ofNullable(item.getOwner()));
+        ItemDto itemDto = itemService.create(ItemMapper.toItemDto(item), user.getId());
+        Assertions.assertEquals(itemDto.getDescription(), item.getDescription());
     }
 
     @Test
@@ -151,6 +160,12 @@ public class ItemServiceTest {
     }
 
     @Test
+    public void searchItemSuccessfulTest2() {
+        List<ItemDto> list = itemService.searchItem("", 10, 0);
+        Assertions.assertEquals(list.size(), 0);
+    }
+
+    @Test
     public void addCommentSuccessfulTest() {
         when(userRepository.findById(any()))
                 .thenReturn(Optional.of(otherUser));
@@ -167,5 +182,38 @@ public class ItemServiceTest {
         CommentDto commentDto = itemService.addComment(CommentMapper.toCommentDto(comment), user.getId(), item.getId());
         Assertions.assertEquals(commentDto.getText(), comment.getText());
         Assertions.assertEquals(commentDto.getAuthorName(), comment.getAuthor().getName());
+    }
+
+    @Test
+    public void addCommentUserNotFoundException() {
+        when(userRepository.findById(any()))
+                .thenReturn(Optional.empty());
+
+        Exception exception = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> itemService.addComment(CommentMapper.toCommentDto(comment), user.getId(), item.getId()));
+        Assertions.assertEquals("Пользователь не найден!", exception.getMessage());
+    }
+
+    @Test
+    public void addCommentItemNotFoundException() {
+        when(userRepository.findById(any()))
+                .thenReturn(Optional.of(otherUser));
+
+        Exception exception = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> itemService.addComment(CommentMapper.toCommentDto(comment), user.getId(), item.getId()));
+        Assertions.assertEquals("Вещь с данным id не найдена!", exception.getMessage());
+    }
+
+    @Test
+    public void addCommentBookingNotFoundException() {
+        when(userRepository.findById(any()))
+                .thenReturn(Optional.of(otherUser));
+
+        when(itemRepository.findById(any()))
+                .thenReturn(Optional.of(item));
+
+        Exception exception = Assertions.assertThrows(BookingException.class,
+                () -> itemService.addComment(CommentMapper.toCommentDto(comment), user.getId(), item.getId()));
+        Assertions.assertEquals("Пользователь не бронирует!", exception.getMessage());
     }
 }
