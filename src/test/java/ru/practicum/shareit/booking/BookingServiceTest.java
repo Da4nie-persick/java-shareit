@@ -196,7 +196,7 @@ public class BookingServiceTest {
     }
 
     @Test
-    public void createBookingInvalidTime() {
+    public void createBooked() {
         item.setAvailable(false);
         BookingDtoRequest bookingRequest = new BookingDtoRequest(
                 LocalDateTime.now().minusDays(1),
@@ -217,6 +217,29 @@ public class BookingServiceTest {
                 () -> bookingService.create(bookingRequest, otherUser.getId()));
 
         Assertions.assertEquals("Забронирован!", exception.getMessage());
+    }
+
+    @Test
+    public void createBookingInvalidTime() {
+        BookingDtoRequest bookingRequest = new BookingDtoRequest(
+                LocalDateTime.now().plusMinutes(1),
+                LocalDateTime.now().plusMinutes(1),
+                item.getId());
+
+        Booking booking = BookingMapper.toBooking(bookingRequest, item, otherUser);
+
+        when(userRepository.findById(booking.getBooker().getId()))
+                .thenReturn(Optional.ofNullable(booking.getBooker()));
+
+        when(itemRepository.findById(bookingRequest.getItemId()))
+                .thenReturn(Optional.ofNullable(item));
+
+        when(bookingRepository.save(booking)).thenReturn(booking);
+
+        Exception exception = Assertions.assertThrows(BookingException.class,
+                () -> bookingService.create(bookingRequest, otherUser.getId()));
+
+        Assertions.assertEquals("Проверьте время!", exception.getMessage());
     }
 
     @Test
@@ -243,6 +266,33 @@ public class BookingServiceTest {
     }
 
     @Test
+    public void approvedOrRejectedBookingNotFound() {
+        Exception exception = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> bookingService.approvedOrRejected(true, booking2.getId(), user.getId()));
+        Assertions.assertEquals("Бронь не найдена!", exception.getMessage());
+    }
+
+    @Test
+    public void approvedOrRejectedUserNotOwnerTest() {
+        when(bookingRepository.save(any())).thenReturn(booking2);
+
+        when(bookingRepository.findById(booking2.getId())).thenReturn(Optional.ofNullable(booking2));
+
+        Exception exception = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> bookingService.approvedOrRejected(true, booking2.getId(), otherUser.getId()));
+        Assertions.assertEquals("Пользователь не является владельцем!", exception.getMessage());
+    }
+
+    @Test
+    public void approvedOrRejectedApprovedInvalidTest() {
+        when(bookingRepository.findById(booking2.getId())).thenReturn(Optional.ofNullable(booking2));
+
+        Exception exception = Assertions.assertThrows(BookingException.class,
+                () -> bookingService.approvedOrRejected(null, booking2.getId(), otherUser.getId()));
+        Assertions.assertEquals("Не корректный approved", exception.getMessage());
+    }
+
+    @Test
     public void getBookingId() {
         when(bookingRepository.findById(booking1.getId())).thenReturn(Optional.ofNullable(booking1));
 
@@ -260,6 +310,14 @@ public class BookingServiceTest {
                 () -> bookingService.getBookingId(booking1.getId(), otherUser.getId()));
 
         Assertions.assertEquals("Не имеет доступ к информации по бронированию!", exception.getMessage());
+    }
+
+    @Test
+    public void getBookingIdBookedNotFoundTest() {
+        Exception exception = Assertions.assertThrows(ObjectNotFoundException.class,
+                () -> bookingService.getBookingId(booking1.getId(), otherUser.getId()));
+
+        Assertions.assertEquals("Бронь не найдена!", exception.getMessage());
     }
 
     @Test
