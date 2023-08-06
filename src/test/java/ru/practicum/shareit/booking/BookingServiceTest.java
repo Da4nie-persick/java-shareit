@@ -227,8 +227,8 @@ public class BookingServiceTest {
     @Test
     public void createBookingInvalidTime() {
         BookingDtoRequest bookingRequest = new BookingDtoRequest(
-                LocalDateTime.now().minusMinutes(90),
-                LocalDateTime.now().plusMinutes(1),
+                LocalDateTime.now().plusMinutes(90),
+                LocalDateTime.now().minusMinutes(9),
                 item.getId());
 
         Booking booking = BookingMapper.toBooking(bookingRequest, item, otherUser);
@@ -409,6 +409,21 @@ public class BookingServiceTest {
                 .thenReturn(List.of(booking1));
 
         List<BookingDtoResponse> list = bookingService.getAllByOwner(user.getId(), "REJECTED", 10, 0);
+
+        Assertions.assertEquals(1, list.size());
+        Assertions.assertEquals("item1", list.get(0).getItem().getName());
+        Assertions.assertEquals("user2", list.get(0).getBooker().getName());
+    }
+
+    @Test
+    public void getAllByOwnerStateWaiting() {
+        when(userRepository.existsById(user.getId()))
+                .thenReturn(true);
+
+        when(bookingRepository.getWaitingOrReject(anyInt(), any(), any()))
+                .thenReturn(List.of(booking2));
+
+        List<BookingDtoResponse> list = bookingService.getAllByOwner(user.getId(), "WAITING", 10, 0);
 
         Assertions.assertEquals(1, list.size());
         Assertions.assertEquals("item1", list.get(0).getItem().getName());

@@ -91,6 +91,16 @@ public class ItemServiceTest {
     }
 
     @Test
+    public void updateTest() {
+        when(itemRepository.findById(any())).thenReturn(Optional.of(item));
+        when(itemRepository.save(any())).thenReturn(item);
+        ItemDto itemDto1 = new ItemDto(null, "item2", "description item1", true, null);
+        ItemDto itemDto = itemService.update(item.getId(), itemDto1, user.getId());
+        Assertions.assertEquals("item2", itemDto.getName());
+        Assertions.assertEquals("description item1", itemDto.getDescription());
+    }
+
+    @Test
     public void getItemIdNotFountException() {
         when(itemRepository.findById(any())).thenReturn(Optional.empty());
 
