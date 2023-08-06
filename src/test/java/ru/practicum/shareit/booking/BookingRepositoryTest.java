@@ -41,7 +41,7 @@ public class BookingRepositoryTest {
     @Test
     public void findAllByBookerIdPast() {
         Booking booking1 = new Booking(null, LocalDateTime.now(), LocalDateTime.now().plusMinutes(7), item1, booker, Status.APPROVED);
-        Booking booking2 = new Booking(null, LocalDateTime.now(), LocalDateTime.now().plusMinutes(7), item2, booker, Status.APPROVED);
+        Booking booking2 = new Booking(null, LocalDateTime.now(), LocalDateTime.now().plusMinutes(90), item2, booker, Status.APPROVED);
         em.persist(owner);
         em.persist(booker);
         em.persist(item1);
@@ -51,15 +51,14 @@ public class BookingRepositoryTest {
         List<Booking> bookings = bookingRepository.findAllByBookerIdPast(booker.getId(),
                 LocalDateTime.now().plusMinutes(9),
                 PageRequest.of(0 / 10, 10));
-        assertThat(bookings, hasSize(2));
+        assertThat(bookings, hasSize(1));
         assertThat(bookings.get(0), equalTo(booking1));
-        assertThat(bookings.get(1), equalTo(booking2));
     }
 
     @Test
     public void findAllByBookerIdFuture() {
         Booking booking1 = new Booking(null, LocalDateTime.now(), LocalDateTime.now().plusMinutes(7), item1, booker, Status.APPROVED);
-        Booking booking2 = new Booking(null, LocalDateTime.now(), LocalDateTime.now().plusMinutes(7), item2, booker, Status.APPROVED);
+        Booking booking2 = new Booking(null, LocalDateTime.now().minusMinutes(90), LocalDateTime.now(), item2, booker, Status.APPROVED);
         em.persist(owner);
         em.persist(booker);
         em.persist(item1);
@@ -67,11 +66,10 @@ public class BookingRepositoryTest {
         em.persist(booking1);
         em.persist(booking2);
         List<Booking> bookings = bookingRepository.findAllByBookerIdFuture(booker.getId(),
-                LocalDateTime.now().minusMinutes(1),
+                LocalDateTime.now().minusMinutes(8),
                 PageRequest.of(0 / 10, 10));
-        assertThat(bookings, hasSize(2));
+        assertThat(bookings, hasSize(1));
         assertThat(bookings.get(0), equalTo(booking1));
-        assertThat(bookings.get(1), equalTo(booking2));
     }
 
     @Test
@@ -107,8 +105,8 @@ public class BookingRepositoryTest {
 
     @Test
     public void getAllTest() {
-        Booking booking1 = new Booking(null, LocalDateTime.now(), LocalDateTime.now().plusMinutes(7), item1, booker, Status.APPROVED);
-        Booking booking2 = new Booking(null, LocalDateTime.now(), LocalDateTime.now().plusMinutes(7), item2, booker, Status.APPROVED);
+        Booking booking1 = new Booking(null, LocalDateTime.now().minusMinutes(1), LocalDateTime.now().plusMinutes(7), item1, booker, Status.APPROVED);
+        Booking booking2 = new Booking(null, LocalDateTime.now(), LocalDateTime.now().plusMinutes(10), item2, booker, Status.APPROVED);
 
         em.persist(owner);
         em.persist(booker);
@@ -119,8 +117,8 @@ public class BookingRepositoryTest {
 
         List<Booking> bookings = bookingRepository.getAll(owner.getId(), PageRequest.of(0 / 10, 10));
         assertThat(bookings, hasSize(2));
-        assertThat(bookings.get(0), equalTo(booking1));
-        assertThat(bookings.get(1), equalTo(booking2));
+        assertThat(bookings.get(0), equalTo(booking2));
+        assertThat(bookings.get(1), equalTo(booking1));
     }
 
     @Test
