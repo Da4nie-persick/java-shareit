@@ -31,8 +31,8 @@ public class ItemController {
 
     @GetMapping
     public List<ItemWithBookingDto> getItemByOwner(@RequestHeader("X-Sharer-User-Id") Integer userId,
-                                                   @RequestParam(defaultValue = "10", required = false) Integer size,
-                                                   @RequestParam(defaultValue = "0", required = false) Integer from) {
+                                                   @RequestParam(defaultValue = "0", required = false) Integer from,
+                                                   @RequestParam(defaultValue = "10", required = false) Integer size) {
         return itemService.getItemByOwner(userId, size, from);
     }
 
@@ -43,8 +43,8 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemDto> searchItem(@RequestParam String text,
-                                    @RequestParam(defaultValue = "10", required = false) Integer size,
-                                    @RequestParam(defaultValue = "0", required = false) Integer from) {
+                                    @RequestParam(defaultValue = "0", required = false) Integer from,
+                                    @RequestParam(defaultValue = "10", required = false) Integer size) {
         return itemService.searchItem(text, size, from);
     }
 
