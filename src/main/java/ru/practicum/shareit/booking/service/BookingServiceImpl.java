@@ -93,9 +93,6 @@ public class BookingServiceImpl implements BookingService {
         if (Arrays.stream(State.values()).noneMatch(s -> s.toString().equals(state))) {
             throw new IllegalArgumentException("Unknown state: " + state);
         }
-        if (from < 0 || size <= 0) {
-            throw new BookingException("Не корректные size or from");
-        }
         List<Booking> bookingList = new ArrayList<>();
         Pageable pageable = PageRequest.of(from / size, size);
         switch (State.valueOf(state)) {
@@ -129,9 +126,6 @@ public class BookingServiceImpl implements BookingService {
         }
         if (Arrays.stream(State.values()).noneMatch(s -> s.toString().equals(state))) {
             throw new IllegalArgumentException("Unknown state: " + state);
-        }
-        if (from < 0 || size <= 0) {
-            throw new BookingException("Не корректные size or from");
         }
         List<Booking> bookingList = new ArrayList<>();
         Pageable pageable = PageRequest.of(from / size, size);

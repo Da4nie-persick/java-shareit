@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository itemRequestRepository;
     private final UserRepository userRepository;
@@ -35,7 +36,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ItemRequestDto> getRequests(Integer requesterId) {
         if (!userRepository.existsById(requesterId)) {
             throw new ObjectNotFoundException("Пользователь не найден!");
@@ -49,7 +49,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ItemRequestDto> getRequestsAllOthers(Integer userId, Integer size, Integer from) {
         if (!userRepository.existsById(userId)) {
             throw new ObjectNotFoundException("Пользователь не найден!");
@@ -64,7 +63,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public ItemRequestDto getRequestId(Integer userId, Integer id) {
         if (!userRepository.existsById(userId)) {
             throw new ObjectNotFoundException("Пользователь не найден!");
