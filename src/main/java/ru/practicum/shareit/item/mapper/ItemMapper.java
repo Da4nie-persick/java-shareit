@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 public class ItemMapper {
     public static final ItemDto toItemDto(Item item) {
-
         ItemDto itemDto = new ItemDto();
         itemDto.setId(item.getId());
         itemDto.setName(item.getName());
