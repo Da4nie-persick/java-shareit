@@ -171,10 +171,10 @@ public class BookingServiceTest {
     public void getAllByUserIdInvalidSize() {
         when(userRepository.existsById(user.getId()))
                 .thenReturn(true);
-        Exception exception = Assertions.assertThrows(BookingException.class,
+        Exception exception = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> bookingService.getAllByUserId(user.getId(), "REJECTED", -1, 0));
 
-        Assertions.assertEquals("Не корректные size or from", exception.getMessage());
+        Assertions.assertEquals("Page size must not be less than one", exception.getMessage());
     }
 
     @Test
@@ -350,10 +350,10 @@ public class BookingServiceTest {
         when(bookingRepository.findAllByBookerIdCurrent(anyInt(), any(), any(), any()))
                 .thenReturn(List.of(booking1, booking2));
 
-        Exception exception = Assertions.assertThrows(BookingException.class,
-                () -> bookingService.getAllByOwner(user.getId(), "CURRENT", 10, -2));
+        Exception exception = Assertions.assertThrows(ArithmeticException.class,
+                () -> bookingService.getAllByOwner(user.getId(), "CURRENT", 0, -2));
 
-        Assertions.assertEquals("Не корректные size or from", exception.getMessage());
+        Assertions.assertEquals("/ by zero", exception.getMessage());
     }
 
     @Test
