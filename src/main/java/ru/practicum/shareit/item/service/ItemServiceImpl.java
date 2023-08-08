@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,19 +82,20 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> searchItem(String query) {
+    public List<ItemDto> searchItem(String query, Integer size, Integer from) {
         if (query.isEmpty()) {
             return new ArrayList<>();
         }
-        return itemRepository.searchItem(query).stream()
+        return itemRepository.searchItem(query, PageRequest.of(from, size)).stream()
                 .map(item -> ItemMapper.toItemDto(item))
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemWithBookingDto> getItemByOwner(Integer userId) {
-        return itemRepository.getAllByOwnerId(userId).stream()
+    public List<ItemWithBookingDto> getItemByOwner(Integer userId, Integer size, Integer from) {
+        return itemRepository.getAllByOwnerId(userId, PageRequest.of(from, size, Sort.by("id")))
+                .stream()
                 .map(item -> {
                     List<Comment> comments = commentRepository.findByItemIdOrderByCreatedDesc(item.getId());
                     Booking last = getLastBooking(item.getId());

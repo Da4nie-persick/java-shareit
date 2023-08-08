@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
@@ -38,7 +40,7 @@ public class BookingServiceImpl implements BookingService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("Пользователь не найден!"));
         if (item.getOwner().getId().equals(userId)) {
-            throw new ObjectNotFoundException("Пользователь не найден!");
+            throw new ObjectNotFoundException("Владелец не может забронировать вещь!");
         }
         if (!item.getAvailable()) {
             throw new BookingException("Забронирован!");
@@ -49,6 +51,7 @@ public class BookingServiceImpl implements BookingService {
             throw new BookingException("Проверьте время!");
         }
         Booking booking = BookingMapper.toBooking(bookingDto, item, user);
+
         return BookingMapper.toBookingDto(bookingRepository.save(booking));
     }
 
@@ -83,7 +86,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDtoResponse> getAllByUserId(Integer userId, String state) {
+    public List<BookingDtoResponse> getAllByUserId(Integer userId, String state, Integer size, Integer from) {
         if (!userRepository.existsById(userId)) {
             throw new ObjectNotFoundException("Пользователь не найден!");
         }
@@ -91,24 +94,25 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalArgumentException("Unknown state: " + state);
         }
         List<Booking> bookingList = new ArrayList<>();
+        Pageable pageable = PageRequest.of(from / size, size);
         switch (State.valueOf(state)) {
             case ALL:
-                bookingList = bookingRepository.findAllByBookerIdOrderByStartDesc(userId);
+                bookingList = bookingRepository.findAllByBookerIdOrderByStartDesc(userId, pageable);
                 break;
             case CURRENT:
-                bookingList = bookingRepository.findAllByBookerIdCurrent(userId, LocalDateTime.now(), LocalDateTime.now());
+                bookingList = bookingRepository.findAllByBookerIdCurrent(userId, LocalDateTime.now(), LocalDateTime.now(), pageable);
                 break;
             case PAST:
-                bookingList = bookingRepository.findAllByBookerIdPast(userId, LocalDateTime.now());
+                bookingList = bookingRepository.findAllByBookerIdPast(userId, LocalDateTime.now(), pageable);
                 break;
             case FUTURE:
-                bookingList = bookingRepository.findAllByBookerIdFuture(userId, LocalDateTime.now());
+                bookingList = bookingRepository.findAllByBookerIdFuture(userId, LocalDateTime.now(), pageable);
                 break;
             case WAITING:
-                bookingList = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING);
+                bookingList = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING, pageable);
                 break;
             case REJECTED:
-                bookingList = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.REJECTED);
+                bookingList = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.REJECTED, pageable);
                 break;
         }
         return bookingList.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
@@ -116,7 +120,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDtoResponse> getAllByOwner(Integer userId, String state) {
+    public List<BookingDtoResponse> getAllByOwner(Integer userId, String state, Integer size, Integer from) {
         if (!userRepository.existsById(userId)) {
             throw new ObjectNotFoundException("Пользователь не найден!");
         }
@@ -124,24 +128,25 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalArgumentException("Unknown state: " + state);
         }
         List<Booking> bookingList = new ArrayList<>();
+        Pageable pageable = PageRequest.of(from / size, size);
         switch (State.valueOf(state)) {
             case ALL:
-                bookingList = bookingRepository.getAll(userId);
+                bookingList = bookingRepository.getAll(userId, pageable);
                 break;
             case CURRENT:
-                bookingList = bookingRepository.getCurrent(userId, LocalDateTime.now());
+                bookingList = bookingRepository.getCurrent(userId, LocalDateTime.now(), pageable);
                 break;
             case PAST:
-                bookingList = bookingRepository.getPast(userId, LocalDateTime.now());
+                bookingList = bookingRepository.getPast(userId, LocalDateTime.now(), pageable);
                 break;
             case FUTURE:
-                bookingList = bookingRepository.getFuture(userId, LocalDateTime.now());
+                bookingList = bookingRepository.getFuture(userId, LocalDateTime.now(), pageable);
                 break;
             case WAITING:
-                bookingList = bookingRepository.getWaitingOrReject(userId, Status.WAITING.toString());
+                bookingList = bookingRepository.getWaitingOrReject(userId, Status.WAITING.toString(), pageable);
                 break;
             case REJECTED:
-                bookingList = bookingRepository.getWaitingOrReject(userId, Status.REJECTED.toString());
+                bookingList = bookingRepository.getWaitingOrReject(userId, Status.REJECTED.toString(), pageable);
                 break;
         }
         return bookingList.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
