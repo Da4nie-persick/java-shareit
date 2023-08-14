@@ -7,7 +7,6 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithBookingDto;
 import ru.practicum.shareit.item.service.ItemService;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -18,7 +17,7 @@ public class ItemController {
 
     @PostMapping
     public ItemDto create(@RequestHeader("X-Sharer-User-Id") Integer userId,
-                          @Valid @RequestBody ItemDto itemDto) {
+                          @RequestBody ItemDto itemDto) {
         return itemService.create(itemDto, userId);
     }
 
@@ -31,25 +30,27 @@ public class ItemController {
 
     @GetMapping
     public List<ItemWithBookingDto> getItemByOwner(@RequestHeader("X-Sharer-User-Id") Integer userId,
-                                                   @RequestParam(defaultValue = "0", required = false) Integer from,
-                                                   @RequestParam(defaultValue = "10", required = false) Integer size) {
+                                                   @RequestParam Integer from,
+                                                   @RequestParam Integer size) {
         return itemService.getItemByOwner(userId, size, from);
     }
 
     @GetMapping("/{id}")
-    public ItemWithBookingDto getItemId(@RequestHeader("X-Sharer-User-Id") Integer userId, @PathVariable Integer id) {
+    public ItemWithBookingDto getItemId(@RequestHeader("X-Sharer-User-Id") Integer userId,
+                                        @PathVariable Integer id) {
         return itemService.getItemId(userId, id);
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchItem(@RequestParam String text,
-                                    @RequestParam(defaultValue = "0", required = false) Integer from,
-                                    @RequestParam(defaultValue = "10", required = false) Integer size) {
+                                    @RequestParam Integer from,
+                                    @RequestParam Integer size) {
         return itemService.searchItem(text, size, from);
     }
 
     @PostMapping("{itemId}/comment")
-    public CommentDto addComment(@Valid @RequestBody CommentDto commentDto, @RequestHeader("X-Sharer-User-Id") Integer userId,
+    public CommentDto addComment(@RequestBody CommentDto commentDto,
+                                 @RequestHeader("X-Sharer-User-Id") Integer userId,
                                  @PathVariable Integer itemId) {
         return itemService.addComment(commentDto, userId, itemId);
     }

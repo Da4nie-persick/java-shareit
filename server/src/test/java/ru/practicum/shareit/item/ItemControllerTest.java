@@ -87,7 +87,7 @@ public class ItemControllerTest {
         when(itemService.getItemByOwner(anyInt(), anyInt(), anyInt()))
                 .thenReturn(dtoList);
 
-        mvc.perform(get("/items")
+        mvc.perform(get("/items" + "/?from=0&size=10")
                         .content(mapper.writeValueAsString(dtoList))
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -123,7 +123,7 @@ public class ItemControllerTest {
         when(itemService.searchItem(anyString(), anyInt(), anyInt()))
                 .thenReturn(List.of(itemDto));
 
-        mvc.perform(get("/items" + "/search?text=ITem")
+        mvc.perform(get("/items" + "/search?text=ITem&from=0&size=10")
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)

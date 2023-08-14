@@ -103,7 +103,7 @@ public class BookingControllerTest {
         when(bookingService.getAllByUserId(anyInt(), anyString(), anyInt(), anyInt()))
                 .thenReturn(List.of(bookingDtoResponse));
 
-        mvc.perform(get("/bookings" + "/?state=ALL")
+        mvc.perform(get("/bookings" + "/?state=ALL&from=0&size=10")
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -123,7 +123,7 @@ public class BookingControllerTest {
         when(bookingService.getAllByOwner(anyInt(), anyString(), anyInt(), anyInt()))
                 .thenReturn(List.of(bookingDtoResponse));
 
-        mvc.perform(get("/bookings" + "/owner?state=ALL")
+        mvc.perform(get("/bookings" + "/owner?state=ALL&from=0&size=10")
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)

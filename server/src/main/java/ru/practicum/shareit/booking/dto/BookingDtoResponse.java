@@ -6,9 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.shareit.booking.model.Status;
 
-import javax.validation.constraints.Future;
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter
@@ -17,11 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class BookingDtoResponse {
     private Integer id;
-    @NotNull
-    @FutureOrPresent(message = "Броннирование не должно быть в прошлом")
     private LocalDateTime start;
-    @NotNull
-    @Future(message = "Броннирование не должно быть в прошлом")
     private LocalDateTime end;
     private Item item;
     private User booker;
@@ -43,5 +36,3 @@ public class BookingDtoResponse {
         private String name;
     }
 }
-
-

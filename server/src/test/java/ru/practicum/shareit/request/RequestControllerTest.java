@@ -81,7 +81,7 @@ public class RequestControllerTest {
         when(itemRequestService.getRequestsAllOthers(anyInt(), anyInt(), anyInt()))
                 .thenReturn(List.of(itemRequestDto));
 
-        mvc.perform(get("/requests" + "/all")
+        mvc.perform(get("/requests" + "/all?from=0&size=10")
                         .header("X-Sharer-User-Id", 1)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
